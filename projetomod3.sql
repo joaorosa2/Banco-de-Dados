@@ -528,31 +528,6 @@ SELECT * FROM modulos_data;
 SELECT * FROM modulos_developer;
 SELECT * FROM turma;
 
--- CONSULTAS (SELECIONAR A QUANTIDADE TOTAL DE ESTUDANTES CADASTRADOS NO BANCO) 
-SELECT  COUNT(nome_do_aluno)
-FROM aluno;
-
--- CONSULTAS (SELECIONAR TODOS OS ESTUDANTES COM OS RESPECTIVOS CURSOS QUE ELES ESTÃO CADASTRADOS)
--- DADOS 
-SELECT * 
-FROM aluno
-WHERE id_curso_fk2 = 1;
-
--- CONSULTAS (SELECIONAR TODOS OS ESTUDANTES COM OS RESPECTIVOS CURSOS QUE ELES ESTÃO CADASTRADOS)
--- WEB DEV
-SELECT * 
-FROM aluno
-WHERE id_curso_fk2 = 2
-
---CONSULTAS (REALIZANDO O AGRUPAMENTO DA QUANTIDADE DE ALUNOS POR ESTADO)
-SELECT estado_do_aluno, 
-COUNT(*) AS total_por_estado FROM aluno 
-GROUP BY estado_do_aluno order by total_por_estado desc;
-
---CONSULTAS (JUNÇÃO DE DUAS TABELAS PARA APRESENTAR EM QUAIS CURSOS OS ALUNOS ESTÃO INSCRITOS)
-select cursos.curso, aluno.nome_do_aluno from aluno
-inner join cursos
-on cursos.id_curso = aluno.id_curso_fk2
 
 --ADICIONANDO NOVAS INFOS EM ALUNO
 
@@ -595,4 +570,80 @@ update aluno set trabalho = '1' where id_aluno IN (5,6,19,17,7,10,8,13);
 update aluno set trabalho = '1' where id_aluno IN (45,46,50,52,53,71,74,75,78,79,64,60,54,65,72,77,22,24,26,28,30,31);
 update aluno set trabalho = '0' where id_aluno IN (80,73,62,67,70,47,48,51,57,68,41,44,49,55,56,58,63,66,69,59,76,40,42,43,61,21,23,25,27,29,32,33,34,35,36,37,38,39,40);
 
+UPDATE modulos_data SET id_facilitador_hard_fk = 2 where id_modulo_data_science in (4,5,6);
+UPDATE modulos_data SET id_facilitador_soft_fk = 1 where id_modulo_data_science in (4);
+UPDATE modulos_data SET id_facilitador_soft_fk = 5 where id_modulo_data_science in (5,6);
 
+
+
+-- 1 CONSULTA: SELECIONAR A QUANTIDADE TOTAL DE ESTUDANTES CADASTRADOS NO BANCO 
+SELECT  COUNT(nome_do_aluno)
+FROM aluno;
+
+-- 2 CONSULTA: SELECIONAR TODOS OS ESTUDANTES COM OS RESPECTIVOS CURSOS QUE ELES ESTÃO CADASTRADOS
+
+-- DADOS 
+SELECT * 
+FROM aluno
+WHERE id_curso_fk2 = 1;
+
+-- WEB DEV
+SELECT * 
+FROM aluno
+WHERE id_curso_fk2 = 2
+
+--JUNÇÃO DE DUAS TABELAS PARA APRESENTAR EM QUAIS CURSOS OS ALUNOS ESTÃO INSCRITOS
+select cursos.curso, aluno.nome_do_aluno from aluno
+inner join cursos
+on cursos.id_curso = aluno.id_curso_fk2
+
+
+--3 CONSULTA: REALIZANDO O AGRUPAMENTO DA QUANTIDADE DE ALUNOS POR ESTADO
+SELECT estado_do_aluno, 
+COUNT(*) AS total_por_estado FROM aluno 
+GROUP BY estado_do_aluno order by total_por_estado desc;
+
+-- 4 CONSULTA: SELECIONANDO ALUNOS DO GÊNERO FEMININO E QUE TRABALHA
+
+select * from aluno where genero = 'Feminino'
+and trabalho !='0';
+
+-- 5 CONSULTA: SELECIONAR QUAIS FACILITADORES ATUAM EM MAIS DE UMA TURMA
+--FACILITADOR HARD SKILLS --DATA SCIENCE
+select facilitadores.nome_facilitador, id_facilitador_hard_fk, count(id_facilitador_hard_fk)
+from modulos_data
+inner join facilitadores
+on facilitadores.id_facilitador = modulos_data.id_facilitador_hard_fk
+group by nome_facilitador, id_facilitador_hard_fk
+having count(id_facilitador_hard_fk) > 1;
+
+----FACILITADOR SOFT SKILLS --DATA SCIENCE
+select facilitadores.nome_facilitador, id_facilitador_soft_fk, count(id_facilitador_soft_fk)
+from modulos_data
+inner join facilitadores
+on facilitadores.id_facilitador = modulos_data.id_facilitador_soft_fk
+group by nome_facilitador, id_facilitador_soft_fk
+having count(id_facilitador_soft_fk) > 1;
+
+----FACILITADOR SOFT SKILLS --WEB DEVELOPER
+select facilitadores.nome_facilitador, id_facilitador_soft_fk, count(id_facilitador_soft_fk)
+from modulos_developer
+inner join facilitadores
+on facilitadores.id_facilitador = modulos_developer.id_facilitador_soft_fk
+group by nome_facilitador, id_facilitador_soft_fk
+having count(id_facilitador_soft_fk) > 1;
+
+----FACILITADOR HARD SKILLS --WEB DEVELOPER
+select facilitadores.nome_facilitador, id_facilitador_hard_fk, count(id_facilitador_hard_fk)
+from modulos_developer
+inner join facilitadores
+on facilitadores.id_facilitador = modulos_developer.id_facilitador_hard_fk
+group by nome_facilitador, id_facilitador_hard_fk
+having count(id_facilitador_hard_fk) > 1;
+
+
+-- 6 CONSULTA: SELECIONAR QUAIS ALUNOS DO CURSO DE DADOS ESTÃO ACIMA DA MÉDIA DE IDADE
+
+SELECT nome_do_aluno, idade_aluno FROM aluno
+WHERE idade_aluno > (select avg(idade_aluno) from aluno)
+AND  id_curso_fk2 =1;
